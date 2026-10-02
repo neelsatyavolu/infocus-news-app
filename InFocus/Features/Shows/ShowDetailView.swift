@@ -62,7 +62,7 @@ struct AnnouncementsRecap: View {
                         HStack(alignment: .firstTextBaseline, spacing: 10) {
                             Rectangle().fill(Brand.green).frame(width: 6, height: 6)
                                 .alignmentGuide(.firstTextBaseline) { $0[.bottom] + 2 }
-                            Text(text)
+                            Text(LinkedText.attributed(text))
                                 .font(.bodyText)
                                 .foregroundStyle(Brand.text)
                                 .fixedSize(horizontal: false, vertical: true)
