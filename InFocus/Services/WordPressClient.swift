@@ -33,7 +33,7 @@ struct WordPressClient: Sendable {
         if !query.staff.isEmpty { items.append(URLQueryItem(name: "staff_name", value: Self.ids(query.staff))) }
         if !query.include.isEmpty { items.append(URLQueryItem(name: "include", value: Self.ids(query.include))) }
 
-        let (data, response) = try await get("wp-json/wp/v2/posts", items)
+        let (data, response) = try await request("wp-json/wp/v2/posts", items)
         // WordPress answers 400 for a page past the end.
         if response.statusCode == 400, page > 1 { return StoryPage(stories: [], totalPages: page - 1) }
         try PortalClient.check(data, response)
@@ -49,7 +49,7 @@ struct WordPressClient: Sendable {
     }
 
     func categories() async throws -> [StoryCategory] {
-        let (data, response) = try await get("wp-json/wp/v2/categories", [
+        let (data, response) = try await request("wp-json/wp/v2/categories", [
             URLQueryItem(name: "per_page", value: "100"),
             URLQueryItem(name: "_fields", value: "id,name,slug,count"),
         ])
@@ -62,7 +62,7 @@ struct WordPressClient: Sendable {
 
     /// Reporter ids whose name matches, for searching by byline.
     func reporters(matching name: String) async throws -> [Int] {
-        let (data, response) = try await get("wp-json/wp/v2/staff_name", [
+        let (data, response) = try await request("wp-json/wp/v2/staff_name", [
             URLQueryItem(name: "search", value: name),
             URLQueryItem(name: "per_page", value: "20"),
             URLQueryItem(name: "_fields", value: "id"),
@@ -84,7 +84,8 @@ struct WordPressClient: Sendable {
 
     // MARK: Plumbing
 
-    private func get(_ path: String, _ items: [URLQueryItem]) async throws -> (Data, HTTPURLResponse) {
+    /// A GET to the site with the browser user agent.
+    func request(_ path: String, _ items: [URLQueryItem]) async throws -> (Data, HTTPURLResponse) {
         var components = URLComponents(url: site.appending(path: path), resolvingAgainstBaseURL: false)!
         components.queryItems = items
         var request = URLRequest(url: components.url!)
