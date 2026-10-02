@@ -1,0 +1,127 @@
+#!/usr/bin/env bash
+# Build InFocus for iPhone, sign it for the App Store and upload it to TestFlight.
+#
+#   scripts/release-ios.sh              # archive + upload to App Store Connect
+#   scripts/release-ios.sh --no-upload  # archive + export build/InFocus.ipa only
+#
+# Needs: the release Xcode (App Store Connect rejects beta-Xcode builds), XcodeGen,
+# Node, and the 1Password CLI signed in. Credentials come from 1Password only:
+#   INFOCUS_IOS_CERT_ITEM   "Apple Distribution Certificate"  AppleDistribution_VTQW687WBQ.p12 + password
+#   INFOCUS_APPLE_KEY_ITEM  "Xanom Apple Dev Creds"           team API key (profile + upload)
+#   INFOCUS_APPLE_VAULT     "Personal"
+#   INFOCUS_OP_ACCOUNT      1Password account (user ID)
+set -euo pipefail
+
+UPLOAD=1
+[ "${1:-}" = "--no-upload" ] && UPLOAD=0
+
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$ROOT"
+
+export DEVELOPER_DIR="${DEVELOPER_DIR:-/Applications/Xcode.app/Contents/Developer}"
+case "$DEVELOPER_DIR" in
+  *beta*) echo "error: $DEVELOPER_DIR is a beta Xcode; App Store Connect rejects its builds" >&2; exit 1 ;;
+esac
+
+VAULT="${INFOCUS_APPLE_VAULT:-Personal}"
+CERT_ITEM="${INFOCUS_IOS_CERT_ITEM:-Apple Distribution Certificate}"
+KEY_ITEM="${INFOCUS_APPLE_KEY_ITEM:-Xanom Apple Dev Creds}"
+# This Mac's 1Password account (sign-in address or user ID) lives in the gitignored scripts/release.env:
+#   INFOCUS_OP_ACCOUNT=...
+[ -f "$ROOT/scripts/release.env" ] && . "$ROOT/scripts/release.env"
+: "${INFOCUS_OP_ACCOUNT:?set INFOCUS_OP_ACCOUNT (your 1Password account) in scripts/release.env}"
+export INFOCUS_OP_ACCOUNT
+TEAM_ID="VTQW687WBQ"
+BUNDLE_ID="com.infocuspaly.news"
+PROFILE_NAME="InFocus News App Store"
+
+op() { command op --account "$INFOCUS_OP_ACCOUNT" "$@"; }
+command op account list >/dev/null 2>&1 || { echo "error: 1Password CLI is not signed in (run: op signin)" >&2; exit 1; }
+command -v xcodegen >/dev/null || { echo "error: XcodeGen is missing (brew install xcodegen)" >&2; exit 1; }
+
+WORK="$(mktemp -d)"
+KEYCHAIN="$WORK/signing.keychain-db"
+# Other builds on this Mac edit the same keychain search list concurrently,
+# so only ever add or remove our own keychain — never restore a snapshot.
+use_keychain() {
+  local others
+  others="$(security list-keychains -d user | tr -d '"' | xargs -n1 | grep -vxF "$KEYCHAIN" | xargs)"
+  # shellcheck disable=SC2086
+  security list-keychains -d user -s "$KEYCHAIN" $others
+}
+cleanup() {
+  local others
+  others="$(security list-keychains -d user | tr -d '"' | xargs -n1 | grep -vxF "$KEYCHAIN" | xargs)"
+  # shellcheck disable=SC2086
+  [ -n "$others" ] && security list-keychains -d user -s $others
+  security delete-keychain "$KEYCHAIN" 2>/dev/null || true
+  rm -rf "$WORK"
+}
+trap cleanup EXIT
+
+echo "› Generating the Xcode project"
+xcodegen generate --quiet
+
+echo "› Loading the distribution certificate into a temporary keychain"
+op read "op://$VAULT/$CERT_ITEM/AppleDistribution_${TEAM_ID}.p12" --out-file "$WORK/dist.p12" >/dev/null
+P12_PASSWORD="$(op read "op://$VAULT/$CERT_ITEM/password")"
+KEYCHAIN_PASSWORD="$(openssl rand -hex 16)"
+security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+security set-keychain-settings -lut 3600 "$KEYCHAIN"
+security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+security import "$WORK/dist.p12" -k "$KEYCHAIN" -P "$P12_PASSWORD" -T /usr/bin/codesign >/dev/null
+security set-key-partition-list -S apple-tool:,apple: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN" >/dev/null
+unset P12_PASSWORD
+# The .p12 carries Apple's intermediate; codesign only finds it on the search list.
+use_keychain
+
+echo "› Checking the App Store profile"
+PROFILE_UUID="$(node scripts/asc-profile.mjs "$WORK/profile.mobileprovision")"
+PROFILES_DIR="$HOME/Library/Developer/Xcode/UserData/Provisioning Profiles"
+mkdir -p "$PROFILES_DIR"
+cp "$WORK/profile.mobileprovision" "$PROFILES_DIR/$PROFILE_UUID.mobileprovision"
+
+BUILD_NUMBER="$(date -u +%Y%m%d%H%M)"
+echo "› Archiving build $BUILD_NUMBER"
+xcodebuild -project InFocus.xcodeproj -scheme InFocus -configuration Release \
+  -destination 'generic/platform=iOS' -archivePath "$WORK/InFocus.xcarchive" \
+  CURRENT_PROJECT_VERSION="$BUILD_NUMBER" OTHER_CODE_SIGN_FLAGS="--keychain $KEYCHAIN" \
+  archive -quiet
+
+DESTINATION=export
+[ "$UPLOAD" = 1 ] && DESTINATION=upload
+cat > "$WORK/ExportOptions.plist" <<PLIST
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>method</key><string>app-store-connect</string>
+  <key>destination</key><string>$DESTINATION</string>
+  <key>teamID</key><string>$TEAM_ID</string>
+  <key>signingStyle</key><string>manual</string>
+  <key>signingCertificate</key><string>Apple Distribution</string>
+  <key>provisioningProfiles</key><dict><key>$BUNDLE_ID</key><string>$PROFILE_NAME</string></dict>
+  <key>uploadSymbols</key><true/>
+  <key>manageAppVersionAndBuildNumber</key><false/>
+</dict>
+</plist>
+PLIST
+
+KEY_ID="$(op item get "$KEY_ITEM" --vault "$VAULT" --fields 'label=Key ID' --reveal)"
+ISSUER_ID="$(op item get "$KEY_ITEM" --vault "$VAULT" --fields 'label=issuer id' --reveal)"
+op read "op://$VAULT/$KEY_ITEM/AuthKey_${KEY_ID}.p8" --out-file "$WORK/AuthKey.p8" >/dev/null
+
+mkdir -p build
+use_keychain # in case another build replaced the search list while we archived
+if [ "$UPLOAD" = 1 ]; then echo "› Uploading to App Store Connect"; else echo "› Exporting build/InFocus.ipa"; fi
+xcodebuild -exportArchive -archivePath "$WORK/InFocus.xcarchive" \
+  -exportOptionsPlist "$WORK/ExportOptions.plist" -exportPath "$WORK/export" \
+  -authenticationKeyPath "$WORK/AuthKey.p8" -authenticationKeyID "$KEY_ID" -authenticationKeyIssuerID "$ISSUER_ID" \
+  -quiet
+
+if [ "$UPLOAD" = 1 ]; then
+  echo "✓ Build $BUILD_NUMBER uploaded. It appears in TestFlight once Apple finishes processing (usually 5–15 minutes)."
+else
+  cp "$WORK/export/"*.ipa build/InFocus.ipa
+  echo "✓ build/InFocus.ipa (build $BUILD_NUMBER)"
+fi

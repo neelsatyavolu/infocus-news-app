@@ -12,3 +12,6 @@ xcuserdata/
 
 # Written by XcodeGen from project.yml
 InFocus/Info.plist
+
+# This Mac's 1Password account for scripts/release-ios.sh
+scripts/release.env
