@@ -9,6 +9,7 @@ struct ShowsView: View {
         NavigationStack {
             content
                 .brandBackground()
+                .readableMargins()
                 .navigationTitle("Shows")
                 .navigationDestination(for: Show.self) { ShowDetailView(show: $0) }
                 .task { await store.load() }

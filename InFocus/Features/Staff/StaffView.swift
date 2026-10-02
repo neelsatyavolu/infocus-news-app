@@ -11,6 +11,7 @@ struct StaffView: View {
             content.padding(Brand.gutter)
         }
         .brandBackground()
+        .readableMargins()
         .navigationTitle(model.selectedYear.map { "Staff \($0)" } ?? "Staff")
         .navigationBarTitleDisplayMode(.inline)
         .navigationDestination(for: StaffMember.self) { StaffDetailView(member: $0, model: model) }

@@ -13,6 +13,7 @@ struct ContactView: View {
             .frame(maxWidth: 720)
         }
         .brandBackground()
+        .readableMargins()
         .navigationTitle("Contact")
         .navigationBarTitleDisplayMode(.inline)
         .task { await model.load() }

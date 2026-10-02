@@ -16,8 +16,9 @@ Then `scripts/release-ios.sh` uploads builds. Internal testers (team members) ge
 
 - **Subtitle:** Paly's student news, live
 - **Category:** News · secondary Education
-- **Support / Marketing URL:** https://infocusnews.tv
-- **Privacy Policy URL:** https://infocusnews.tv/about/ (replace with a dedicated privacy page before App Store review)
+- **Support URL:** https://infocuspaly.com/support (also linked in the app: More → Help & support)
+- **Marketing URL:** https://infocusnews.tv
+- **Privacy Policy URL:** https://infocuspaly.com/privacy (also in the app: More → Privacy policy, and under the announcement form)
 - **Keywords:** `paly,palo alto,high school,student,news,broadcast,infocus,announcements,sports,livestream,school`
 
 **Promotional text**
@@ -37,7 +38,7 @@ Then `scripts/release-ios.sh` uploads builds. Internal testers (team members) ge
 >
 > Made by students in Paly's broadcast journalism program.
 
-**Screenshots:** 6.9" iPhone (1320 × 2868): Home, Shows, a story playing, Live, the announcement form. Capture on the iPhone 18 Pro Max simulator in light and dark.
+**Screenshots:** 6 each for 6.9" iPhone (1320 × 2868) and 13" iPad (2064 × 2752), in `build/appstore-screenshots/{iphone,ipad}/` (not committed): Home with the announcements recap, Shows, a show with its announcements, Stories, Live, and the announcement form. Captured from the real app with live public InFocus content, status bar set to 9:41, mixed light and dark. Staff photos are left out of the store set.
 
 ## App Privacy answers
 

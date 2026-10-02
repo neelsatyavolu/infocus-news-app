@@ -8,6 +8,8 @@ enum Brand {
     static let radius: CGFloat = 6
     static let tagRadius: CGFloat = 4
     static let gutter: CGFloat = 16
+    /// Widest a page column gets (iPad, landscape): about 70 characters of body text.
+    static let readableWidth: CGFloat = 760
 
     // Surfaces
     static let background = Color.dynamic(dark: 0x0F110F, light: 0xF4F6F5)

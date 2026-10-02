@@ -11,6 +11,7 @@ struct StoriesView: View {
         NavigationStack {
             list
                 .brandBackground()
+                .readableMargins()
                 .navigationTitle("Stories")
                 .navigationDestination(for: Story.self) { StoryDetailView(story: $0) }
                 .navigationDestination(for: SavedRoute.self) { _ in SavedView() }

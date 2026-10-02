@@ -13,6 +13,7 @@ struct AboutView: View {
             .frame(maxWidth: 720)
         }
         .brandBackground()
+        .readableMargins()
         .navigationTitle("About us")
         .navigationBarTitleDisplayMode(.inline)
         .task { await model.load() }

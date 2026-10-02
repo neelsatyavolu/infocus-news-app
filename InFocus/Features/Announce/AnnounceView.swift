@@ -17,6 +17,7 @@ struct AnnounceView: View {
             }
         }
         .brandBackground()
+        .readableMargins()
         .navigationTitle("Announcement")
         .navigationBarTitleDisplayMode(.inline)
         .task {
@@ -104,6 +105,12 @@ private struct AnnounceForm: View {
                 .disabled(model.status == .sending)
                 .listRowInsets(EdgeInsets())
                 .listRowBackground(Color.clear)
+            } footer: {
+                Text("InFocus uses your name and email only to review your announcement and contact you about it. [Privacy policy](https://infocuspaly.com/privacy)")
+                    .font(.small)
+                    .foregroundStyle(Brand.muted)
+                    .tint(Brand.green)
+                    .padding(.top, 8)
             }
         }
         .font(.bodyText)

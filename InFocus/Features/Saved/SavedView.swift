@@ -25,6 +25,7 @@ struct SavedView: View {
             }
         }
         .brandBackground()
+        .readableMargins()
         .navigationTitle("Saved")
     }
 }

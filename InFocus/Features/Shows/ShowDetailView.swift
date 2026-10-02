@@ -20,6 +20,7 @@ struct ShowDetailView: View {
             }
         }
         .brandBackground()
+        .readableMargins()
         .navigationTitle(show.dateLabel ?? "Show")
         .navigationBarTitleDisplayMode(.inline)
         .task(id: show.showDate) {

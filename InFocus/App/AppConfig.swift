@@ -14,6 +14,7 @@ enum AppConfig {
 
     static let newsSiteURL = URL(string: "https://infocusnews.tv/")!
     static let privacyURL = URL(string: "https://infocuspaly.com/privacy")!
+    static let supportURL = URL(string: "https://infocuspaly.com/support")!
 
     static var version: String {
         Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0"

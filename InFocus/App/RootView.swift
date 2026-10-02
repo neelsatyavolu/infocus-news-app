@@ -33,6 +33,7 @@ struct RootView: View {
                         }
                     }
             }
+            .pageSizedOnIPad()
         }
         .fullScreenCover(isPresented: Binding(get: { !preferences.onboarded },
                                               set: { if !$0 { preferences.onboarded = true } })) {
@@ -65,5 +66,12 @@ extension Show {
     static func placeholder(videoId: String, title: String?) -> Show {
         Show(videoId: videoId, title: title ?? "InFocus News", showDate: nil, publishedAt: nil,
              thumbnailUrl: YouTube.thumbnailURL(videoId), durationSeconds: nil)
+    }
+}
+
+private extension View {
+    /// A notification's show or story fills most of an iPad screen instead of a small form sheet.
+    @ViewBuilder func pageSizedOnIPad() -> some View {
+        if #available(iOS 18.0, *) { presentationSizing(.page) } else { self }
     }
 }

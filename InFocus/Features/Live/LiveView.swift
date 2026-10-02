@@ -10,6 +10,7 @@ struct LiveView: View {
                 content.padding(.bottom, 24)
             }
             .brandBackground()
+            .readableMargins()
             .navigationTitle("Live")
             .navigationDestination(for: LiveVideo.self) { LivePlayerView(video: $0) }
             .task { await store.load() }
@@ -167,6 +168,7 @@ struct LivePlayerView: View {
             }
         }
         .brandBackground()
+        .readableMargins()
         .navigationTitle(video.isLive ? "Live" : "Replay")
         .navigationBarTitleDisplayMode(.inline)
     }

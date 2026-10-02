@@ -25,6 +25,7 @@ struct StoryDetailView: View {
             }
         }
         .brandBackground()
+        .readableMargins()
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
@@ -112,6 +113,7 @@ struct StoryLoaderView: View {
             }
         }
         .brandBackground()
+        .readableMargins()
         .task { await load() }
     }
 

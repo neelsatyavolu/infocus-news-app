@@ -40,6 +40,8 @@ struct MoreView: View {
                     NavigationLink(value: MoreRoute.settings) {
                         MoreRow(title: "Settings", detail: "Notifications and appearance", symbol: "gearshape")
                     }
+                    ExternalRow(url: AppConfig.supportURL, title: "Help & support", detail: "Answers and how to reach us",
+                                symbol: "questionmark.circle")
                     ExternalRow(url: AppConfig.privacyURL, title: "Privacy policy", detail: "What the app collects",
                                 symbol: "hand.raised")
                 } header: {
@@ -54,6 +56,7 @@ struct MoreView: View {
             }
             .scrollContentBackground(.hidden)
             .brandBackground()
+            .readableMargins()
             .navigationTitle("More")
             .navigationDestination(for: MoreRoute.self) { route in
                 switch route {

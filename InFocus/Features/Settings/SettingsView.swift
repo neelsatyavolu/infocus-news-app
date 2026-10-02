@@ -47,6 +47,7 @@ struct SettingsView: View {
         .font(.bodyText)
         .scrollContentBackground(.hidden)
         .brandBackground()
+        .readableMargins()
         .navigationTitle("Settings")
         .onChange(of: preferences.notifyShows) { push.scheduleSync() }
         .onChange(of: preferences.notifyStories) { push.scheduleSync() }

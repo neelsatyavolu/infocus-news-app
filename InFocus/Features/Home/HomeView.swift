@@ -23,6 +23,7 @@ struct HomeView: View {
                 .padding(.bottom, 16)
             }
             .brandBackground()
+            .readableMargins()
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     Image("Wordmark").resizable().scaledToFit().frame(height: 26)

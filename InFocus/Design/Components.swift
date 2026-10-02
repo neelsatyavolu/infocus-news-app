@@ -18,6 +18,21 @@ extension View {
 
     /// The page background, edge to edge.
     func brandBackground() -> some View { background(Brand.background.ignoresSafeArea()) }
+
+    /// For a ScrollView or List: its content in one centered column of
+    /// readable width. No change on iPhone; no stretched rows or giant
+    /// players on iPad.
+    func readableMargins() -> some View { modifier(ReadableMargins()) }
+}
+
+private struct ReadableMargins: ViewModifier {
+    @State private var width: CGFloat = 0
+
+    func body(content: Content) -> some View {
+        content
+            .contentMargins(.horizontal, max(0, (width - Brand.readableWidth) / 2), for: .scrollContent)
+            .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { width = $0 }
+    }
 }
 
 /// The web nameplate (DESIGN.md §10): a square plate with a 4px InFocus

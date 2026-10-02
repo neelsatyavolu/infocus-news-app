@@ -26,6 +26,7 @@ struct StaffDetailView: View {
             .frame(maxWidth: 720)
         }
         .brandBackground()
+        .readableMargins()
         .navigationTitle(member.name)
         .navigationBarTitleDisplayMode(.inline)
         .task(id: member.id) { await load() }
