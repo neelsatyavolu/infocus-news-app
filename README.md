@@ -12,7 +12,7 @@ Bundle ID `com.infocuspaly.news` · SwiftUI · iOS 17+ · no third-party depende
 | **Shows** | Every episode, one season at a time (`InFocus News \| Season N` playlists). A show plays in the app with its announcements underneath. |
 | **Stories** | All infocusnews.tv stories with category chips, endless scroll and search by headline or reporter. A story plays its video in the app; bookmark it to save it on the device. |
 | **Live** | What's streaming now, upcoming livestreams (games, concerts, ceremonies) and replays. |
-| **More** | Submit an announcement, saved stories, settings (alerts for new shows / new stories / going live, System/Light/Dark), links. |
+| **More** | Get involved (submit an announcement, saved stories) · About InFocus (About us and Contact rendered natively from the site, the staff directory by school year with bios and each person's stories) · Follow (Instagram, YouTube, TikTok, X, website; opens the app when installed) · App (settings, privacy policy, version). |
 
 Notifications: the first launch explains the three alerts and only then asks iOS for permission. The device's APNs token is registered with the Portal (no account); tapping an alert opens that show, story or stream.
 
@@ -20,6 +20,7 @@ Notifications: the first launch explains the three alerts and only then asks iOS
 
 - **Stories:** the WordPress REST API on infocusnews.tv (`/wp-json/wp/v2/posts`, `categories`, `staff_name` for bylines). The site's firewall rejects non-browser requests, so the app sends a Safari user agent. A story's video isn't in the REST content, so the app reads the first YouTube embed between the headline and the share icons of the story page (`StoryPageParser`).
 - **Shows, live, announcements, alerts:** the InFocus Portal's public API (`https://infocuspaly.com/api/public/…`), which reads the InFocus YouTube channel and the show's teleprompter bulletin on the server. The app holds no API keys.
+- **About us, Contact, Staff:** the site's `about` and `contact-us` pages (REST), rendered natively by `ArticleHTML` (headings, paragraphs, lists, bold, links); the staff grid from the staff page (`/staff/?schoolyear=…`, parsed by `StaffPageParser`) with bios from the `staff_profile` post type.
 - **Announcement form:** the Portal's existing `POST /api/announcements/submit`.
 - **Video:** the YouTube embed player (`youtube-nocookie.com`) in a web view, with "Open in YouTube".
 
@@ -52,7 +53,7 @@ xcodebuild -project InFocus.xcodeproj -scheme InFocus \
   -destination 'platform=iOS Simulator,name=iPhone 18 Pro' test CODE_SIGNING_ALLOWED=NO
 ```
 
-Debug-only launch arguments: `-InFocusPortalURL http://127.0.0.1:3000` (a local Portal), `-InFocusTab shows|stories|live|more`, `-InFocusOpen story:<id>|show:<videoId>|live:<videoId>`.
+Debug-only launch arguments: `-InFocusPortalURL http://127.0.0.1:3000` (a local Portal), `-InFocusTab shows|stories|live|more`, `-InFocusMore about|staff|contact|settings`, `-InFocusOpen story:<id>|show:<videoId>|live:<videoId>`.
 
 Regenerate the icon and wordmarks from the InFocus 2026 Package: `swift scripts/make-assets.swift "<…>/InFocus 2026 Package/01 Logos"`.
 

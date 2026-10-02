@@ -43,15 +43,6 @@ struct SettingsView: View {
                 .pickerStyle(.segmented)
             }
 
-            Section("About") {
-                Link(destination: AppConfig.newsSiteURL) { Label("infocusnews.tv", systemImage: "safari") }
-                Link(destination: YouTube.channelURL) { Label("InFocus on YouTube", systemImage: "play.rectangle") }
-                Link(destination: AppConfig.aboutURL) { Label("About InFocus", systemImage: "info.circle") }
-                Link(destination: AppConfig.privacyURL) { Label("Privacy", systemImage: "hand.raised") }
-                LabeledContent("Version") {
-                    Text("\(AppConfig.version) (\(AppConfig.build))").font(.mono(14))
-                }
-            }
         }
         .font(.bodyText)
         .scrollContentBackground(.hidden)

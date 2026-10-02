@@ -13,13 +13,15 @@ final class Router {
     var presented: Destination?
     /// Switches to Stories with its search field focused (Home's search button).
     var focusStorySearch = false
+    /// The More tab's navigation stack.
+    var morePath = NavigationPath()
 
     func open(_ destination: Destination) {
         presented = destination
     }
 
     #if DEBUG
-    /// Screenshots and manual checks: `-InFocusTab stories`, `-InFocusOpen story:2619`.
+    /// Screenshots and manual checks: `-InFocusTab stories`, `-InFocusMore staff`, `-InFocusOpen story:2619`.
     func applyLaunchArguments(_ defaults: UserDefaults = .standard) {
         switch defaults.string(forKey: "InFocusTab") {
         case "shows": tab = .shows
@@ -27,6 +29,12 @@ final class Router {
         case "live": tab = .live
         case "more": tab = .more
         default: break
+        }
+        let more: [String: MoreRoute] = ["about": .about, "staff": .staff, "contact": .contact, "settings": .settings,
+                                          "announce": .announce, "saved": .saved]
+        if let route = defaults.string(forKey: "InFocusMore").flatMap({ more[$0] }) {
+            tab = .more
+            morePath.append(route)
         }
         let parts = defaults.string(forKey: "InFocusOpen")?.split(separator: ":").map(String.init) ?? []
         guard parts.count == 2 else { return }
