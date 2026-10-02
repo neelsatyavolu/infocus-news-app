@@ -1,0 +1,14 @@
+{ "data": {
+  "latest": { "videoId": "abcDEF12345", "title": "InFocus News | Friday, September 25th, 2026", "showDate": "2026-09-25",
+              "publishedAt": "2026-09-25T15:30:00.000Z", "thumbnailUrl": "https://i.ytimg.com/vi/abcDEF12345/hqdefault.jpg", "durationSeconds": 742 },
+  "seasons": [
+    { "number": 31, "title": "InFocus News | Season 31", "playlistId": "PLtest31", "shows": [
+      { "videoId": "abcDEF12345", "title": "InFocus News | Friday, September 25th, 2026", "showDate": "2026-09-25",
+        "publishedAt": "2026-09-25T15:30:00.000Z", "thumbnailUrl": "https://i.ytimg.com/vi/abcDEF12345/hqdefault.jpg", "durationSeconds": 742 },
+      { "videoId": "zyx-_987654", "title": "InFocusNews | Wednesday, September 23, 2026", "showDate": null,
+        "publishedAt": "2026-09-23T15:30:00Z", "thumbnailUrl": null, "durationSeconds": null }
+    ] },
+    { "number": 30, "title": "InFocus News | Season 30", "playlistId": "PLtest30", "shows": [] }
+  ],
+  "upcomingShowDates": ["2026-10-07", "2026-10-09", "2026-10-14", "2026-10-16", "2026-10-21"]
+} }

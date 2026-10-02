@@ -1,0 +1,24 @@
+[
+  { "id": 2619, "date_gmt": "2026-09-25T16:02:54", "link": "https://infocusnews.tv/2619/news/example-story/",
+    "title": { "rendered": "Breaking &#8216;News&#8217; &amp; More" },
+    "excerpt": { "rendered": "" }, "content": { "rendered": "\n" },
+    "categories": [7], "staff_name": [99, 84, 135],
+    "_embedded": {
+      "wp:featuredmedia": [ { "source_url": "https://infocusnews.tv/wp-content/uploads/full.png",
+        "media_details": { "sizes": { "large": { "source_url": "https://infocusnews.tv/wp-content/uploads/large.png" },
+                                       "medium_large": { "source_url": "https://infocusnews.tv/wp-content/uploads/ml.png" } } } } ],
+      "wp:term": [ [ { "id": 7, "name": "News", "slug": "news", "taxonomy": "category" } ], [],
+                   [ { "id": 84, "name": "Otto Example", "slug": "otto", "taxonomy": "staff_name" },
+                     { "id": 99, "name": "Abby Example", "slug": "abby", "taxonomy": "staff_name" },
+                     { "id": 135, "name": "Sage Example", "slug": "sage", "taxonomy": "staff_name" } ] ]
+    } },
+  { "id": 2340, "date_gmt": "2025-11-14T19:04:09", "link": "https://infocusnews.tv/2340/features/text-story/",
+    "title": { "rendered": "A Text Story" },
+    "excerpt": { "rendered": "<p>Short summary&hellip;</p>" },
+    "content": { "rendered": "<p><span>First paragraph with a <a href=\"#\">link</a>.</span></p>\n<p>Second&nbsp;paragraph.</p><figure><img src=\"x\"></figure><p></p>" },
+    "categories": [6], "staff_name": [],
+    "_embedded": {
+      "wp:featuredmedia": [ { "code": "rest_forbidden", "message": "Sorry", "data": { "status": 401 } } ],
+      "wp:term": [ [ { "id": 6, "name": "Features", "slug": "features", "taxonomy": "category" } ] ]
+    } }
+]
