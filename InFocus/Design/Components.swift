@@ -31,7 +31,31 @@ private struct ReadableMargins: ViewModifier {
     func body(content: Content) -> some View {
         content
             .contentMargins(.horizontal, max(0, (width - Brand.readableWidth) / 2), for: .scrollContent)
-            .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { width = $0 }
+            .modifier(WidthReader(width: $width))
+    }
+}
+
+/// `onGeometryChange` is iOS 18. The app still runs on iOS 17, so measure there
+/// with a geometry reader instead of failing to build.
+private struct WidthReader: ViewModifier {
+    @Binding var width: CGFloat
+
+    @ViewBuilder func body(content: Content) -> some View {
+        if #available(iOS 18.0, *) {
+            content.onGeometryChange(for: CGFloat.self) { $0.size.width } action: { width = $0 }
+        } else {
+            content.background {
+                GeometryReader { proxy in
+                    Color.clear
+                        .onAppear { setWidth(proxy.size.width) }
+                        .onChange(of: proxy.size.width) { _, newWidth in setWidth(newWidth) }
+                }
+            }
+        }
+    }
+
+    private func setWidth(_ newWidth: CGFloat) {
+        if width != newWidth { width = newWidth }
     }
 }
 

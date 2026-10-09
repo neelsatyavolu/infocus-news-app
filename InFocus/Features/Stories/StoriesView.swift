@@ -23,7 +23,7 @@ struct StoriesView: View {
                         .accessibilityLabel("Saved stories")
                     }
                 }
-                .searchable(text: $searchText, isPresented: $searchPresented, prompt: "Search stories or reporters")
+                .modifier(StorySearchField(text: $searchText, presented: $searchPresented))
                 .task(id: searchText) { await model.search(searchText) }
                 .task { await model.start() }
                 .refreshable { await model.reload() }
@@ -72,6 +72,21 @@ struct StoriesView: View {
 }
 
 struct SavedRoute: Hashable {}
+
+/// Presents search from Home's magnifying glass. The `isPresented` binding is iOS 18;
+/// on iOS 17 the field is still there, it just isn't focused automatically.
+private struct StorySearchField: ViewModifier {
+    @Binding var text: String
+    @Binding var presented: Bool
+
+    @ViewBuilder func body(content: Content) -> some View {
+        if #available(iOS 18.0, *) {
+            content.searchable(text: $text, isPresented: $presented, prompt: "Search stories or reporters")
+        } else {
+            content.searchable(text: $text, prompt: "Search stories or reporters")
+        }
+    }
+}
 
 /// "All" plus the site's categories that have stories.
 private struct CategoryBar: View {

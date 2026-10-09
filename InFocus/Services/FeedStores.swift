@@ -7,21 +7,30 @@ final class ShowsStore {
     private(set) var feed: Loadable<ShowsFeed> = .idle
     private(set) var announcements: [String: Loadable<[String]>] = [:]
     private let client: PortalClient
+    private var loadGeneration = 0
+    private var announcementGeneration: [String: Int] = [:]
 
     init(client: PortalClient = .shared) {
         self.client = client
     }
 
     /// Loads once; `force` (pull to refresh) reloads but keeps showing the old feed meanwhile.
+    /// A slower request can't replace a newer one, or turn a successful refresh into an error.
     func load(force: Bool = false) async {
         if !force, feed.value != nil || feed.isLoading { return }
+        loadGeneration += 1
+        let generation = loadGeneration
         if feed.value == nil { feed = .loading }
         do {
-            feed = .loaded(try await client.shows())
+            let loaded = try await client.shows().removingDuplicateEpisodes()
+            guard generation == loadGeneration || feed.value == nil else { return }
+            feed = .loaded(loaded)
         } catch is CancellationError {
+            guard generation == loadGeneration else { return }
             if feed.isLoading { feed = .idle }
         } catch {
-            if feed.value == nil || !force { feed = .failed(Loadable<ShowsFeed>.message(for: error)) }
+            guard generation == loadGeneration else { return }
+            if feed.value == nil { feed = .failed(Loadable<ShowsFeed>.message(for: error)) }
         }
     }
 
@@ -37,15 +46,24 @@ final class ShowsStore {
 
     func loadAnnouncements(for showDate: String, force: Bool = false) async {
         if !force, let state = announcements[showDate], state.value != nil || state.isLoading { return }
-        announcements[showDate] = .loading
+        let generation = (announcementGeneration[showDate] ?? 0) + 1
+        announcementGeneration[showDate] = generation
+        if announcements[showDate]?.value == nil { announcements[showDate] = .loading }
         do {
-            announcements[showDate] = .loaded(try await client.announcements(for: showDate).announcements)
+            let items = try await client.announcements(for: showDate).announcements
+            guard announcementGeneration[showDate] == generation else { return }
+            announcements[showDate] = .loaded(items)
         } catch let error as APIError where error.status == 404 {
+            guard announcementGeneration[showDate] == generation else { return }
             announcements[showDate] = .loaded([])
         } catch is CancellationError {
-            announcements[showDate] = nil
+            guard announcementGeneration[showDate] == generation else { return }
+            if announcements[showDate]?.isLoading == true { announcements[showDate] = nil }
         } catch {
-            announcements[showDate] = .failed(Loadable<[String]>.message(for: error))
+            guard announcementGeneration[showDate] == generation else { return }
+            if announcements[showDate]?.value == nil {
+                announcements[showDate] = .failed(Loadable<[String]>.message(for: error))
+            }
         }
     }
 }
@@ -55,6 +73,7 @@ final class ShowsStore {
 final class LiveStore {
     private(set) var feed: Loadable<LiveFeed> = .idle
     private let client: PortalClient
+    private var loadGeneration = 0
 
     init(client: PortalClient = .shared) {
         self.client = client
@@ -64,13 +83,19 @@ final class LiveStore {
 
     func load(force: Bool = false) async {
         if !force, feed.value != nil || feed.isLoading { return }
+        loadGeneration += 1
+        let generation = loadGeneration
         if feed.value == nil { feed = .loading }
         do {
-            feed = .loaded(try await client.live())
+            let loaded = try await client.live()
+            guard generation == loadGeneration || feed.value == nil else { return }
+            feed = .loaded(loaded)
         } catch is CancellationError {
+            guard generation == loadGeneration else { return }
             if feed.isLoading { feed = .idle }
         } catch {
-            if feed.value == nil || !force { feed = .failed(Loadable<LiveFeed>.message(for: error)) }
+            guard generation == loadGeneration else { return }
+            if feed.value == nil { feed = .failed(Loadable<LiveFeed>.message(for: error)) }
         }
     }
 }

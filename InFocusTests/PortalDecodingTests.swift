@@ -51,6 +51,22 @@ struct PortalDecodingTests {
         #expect(Duration.label(3725) == "1:02:05")
     }
 
+    @Test func duplicateEpisodesInOneSeasonAreDropped() {
+        let episode = Show(videoId: "abcDEF12345", title: "InFocus News | Friday", showDate: "2026-09-25",
+                           publishedAt: nil, thumbnailUrl: nil, durationSeconds: 10)
+        let other = Show(videoId: "zyx-_987654", title: "Other", showDate: nil,
+                         publishedAt: nil, thumbnailUrl: nil, durationSeconds: nil)
+        let feed = ShowsFeed(
+            latest: episode,
+            seasons: [Season(number: 27, title: "InFocus News | Season 27", playlistId: "PLtest",
+                             shows: [episode, episode, other, other])],
+            upcomingShowDates: [])
+        let cleaned = feed.removingDuplicateEpisodes()
+        #expect(cleaned.seasons[0].shows.map(\.videoId) == ["abcDEF12345", "zyx-_987654"])
+        #expect(cleaned.latest == episode)
+        #expect(cleaned.removingDuplicateEpisodes().seasons[0].shows.count == 2)
+    }
+
     @Test func seriesPrefixIsStripped() {
         #expect(Show.strippingSeries("InFocus News | Friday, September 4th, 2026") == "Friday, September 4th, 2026")
         #expect(Show.strippingSeries("InFocusNews | Wednesday") == "Wednesday")

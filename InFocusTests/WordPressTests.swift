@@ -67,4 +67,16 @@ struct WordPressTests {
         #expect(StoryPageParser.videoID(in: #"<p class="sno-story-headline">x</p><a href="https://youtu.be/abcDEF12345">"#) == "abcDEF12345")
         #expect(StoryPageParser.videoID(in: #"sno-story-headline <iframe src="https://www.youtube-nocookie.com/embed/abcDEF_1-45">"#) == "abcDEF_1-45")
     }
+
+    @Test func stylesheetClassNamesDoNotHideOrReplaceTheStoryVideo() {
+        let page = """
+        <style>.sno-story-headline { font-weight: 600 } .sno-story-social-icons { display: flex }</style>
+        <header><a href="https://www.youtube.com/watch?v=HEADERxxxxx">YouTube</a></header>
+        <h1 class="sno-story-headline">Title</h1>
+        <iframe src="https://www.youtube.com/embed/0SHOaN11vKM"></iframe>
+        <div class="sno-story-social-icons"></div>
+        <iframe src="https://www.youtube.com/embed/FOOTERxxxxx"></iframe>
+        """
+        #expect(StoryPageParser.videoID(in: page) == "0SHOaN11vKM")
+    }
 }

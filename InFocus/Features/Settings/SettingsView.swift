@@ -21,9 +21,14 @@ struct SettingsView: View {
                 case .allowed:
                     EmptyView()
                 }
+                // Disabled on their own. Disabling the whole section would also
+                // disable "Open iOS Settings", which is the way back from a denial.
                 Toggle("New shows", isOn: $preferences.notifyShows)
+                    .disabled(push.permission == .denied)
                 Toggle("New stories", isOn: $preferences.notifyStories)
+                    .disabled(push.permission == .denied)
                 Toggle("Going live", isOn: $preferences.notifyLive)
+                    .disabled(push.permission == .denied)
             } header: {
                 Text("Notifications")
             } footer: {
@@ -34,7 +39,6 @@ struct SettingsView: View {
                     Text("Get an alert when a new episode is up, a story is posted, or InFocus starts streaming a game or event.")
                 }
             }
-            .disabled(push.permission == .denied)
 
             Section("Appearance") {
                 Picker("Theme", selection: $preferences.appearance) {

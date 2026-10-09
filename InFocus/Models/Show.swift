@@ -5,6 +5,17 @@ struct ShowsFeed: Decodable, Sendable, Equatable {
     let latest: Show?
     let seasons: [Season]
     let upcomingShowDates: [String]
+
+    /// The channel sometimes lists one episode twice in a season. Those rows
+    /// share an id, which breaks the shows list.
+    func removingDuplicateEpisodes() -> ShowsFeed {
+        ShowsFeed(latest: latest, seasons: seasons.map { season in
+            var seen = Set<String>()
+            let unique = season.shows.filter { seen.insert($0.videoId).inserted }
+            guard unique.count != season.shows.count else { return season }
+            return Season(number: season.number, title: season.title, playlistId: season.playlistId, shows: unique)
+        }, upcomingShowDates: upcomingShowDates)
+    }
 }
 
 struct Season: Decodable, Sendable, Equatable, Identifiable {

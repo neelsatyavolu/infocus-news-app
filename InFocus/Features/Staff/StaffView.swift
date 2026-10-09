@@ -33,7 +33,7 @@ struct StaffView: View {
             }
         }
         .task { await model.load() }
-        .refreshable { await model.load(year: model.selectedYear, force: true) }
+        .refreshable { await model.load(year: model.directory.value == nil ? model.requestedYear : model.selectedYear, force: true) }
     }
 
     @ViewBuilder private var content: some View {
@@ -50,7 +50,7 @@ struct StaffView: View {
             }
         case .failed(let message):
             ErrorStateView(title: "Couldn't load the staff", message: message) {
-                Task { await model.load(year: model.selectedYear, force: true) }
+                Task { await model.load(year: model.requestedYear, force: true) }
             }
         case .loaded(let directory) where directory.members.isEmpty:
             EmptyStateView(title: "No staff listed", message: "The \(directory.year) staff isn't posted yet.")

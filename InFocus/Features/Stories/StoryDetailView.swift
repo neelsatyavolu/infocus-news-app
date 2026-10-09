@@ -114,14 +114,20 @@ struct StoryLoaderView: View {
         }
         .brandBackground()
         .readableMargins()
-        .task { await load() }
+        .task(id: storyID) { await load() }
     }
 
     private func load() async {
+        let requested = storyID
         state = .loading
         do {
-            state = .loaded(try await WordPressClient.shared.story(id: storyID))
+            let story = try await WordPressClient.shared.story(id: requested)
+            guard requested == storyID else { return }
+            state = .loaded(story)
+        } catch is CancellationError {
+            return
         } catch {
+            guard requested == storyID else { return }
             state = .failed(Loadable<Story>.message(for: error))
         }
     }

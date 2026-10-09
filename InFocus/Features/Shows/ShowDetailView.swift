@@ -51,8 +51,13 @@ struct AnnouncementsRecap: View {
                 Skeleton(height: 64)
                 Skeleton(height: 64)
             }
-        case .failed:
-            EmptyView()
+        case .failed(let message):
+            VStack(alignment: .leading, spacing: 8) {
+                SectionHeader(title: title)
+                ErrorStateView(title: "Couldn't load announcements", message: message) {
+                    Task { await store.loadAnnouncements(for: showDate, force: true) }
+                }
+            }
         case .loaded(let items) where items.isEmpty:
             EmptyView()
         case .loaded(let items):

@@ -7,6 +7,7 @@ struct HomeView: View {
     @Environment(LiveStore.self) private var live
     @Environment(Router.self) private var router
     @State private var latestStories: Loadable<[Story]> = .idle
+    @State private var storiesGeneration = 0
 
     var body: some View {
         NavigationStack {
@@ -75,13 +76,18 @@ struct HomeView: View {
 
     private func loadStories(force: Bool) async {
         if !force, latestStories.value != nil { return }
+        storiesGeneration += 1
+        let generation = storiesGeneration
         if latestStories.value == nil { latestStories = .loading }
         do {
             let page = try await WordPressClient.shared.stories(.init(perPage: 5), page: 1)
+            guard generation == storiesGeneration || latestStories.value == nil else { return }
             latestStories = .loaded(page.stories)
         } catch is CancellationError {
+            guard generation == storiesGeneration else { return }
             if latestStories.isLoading { latestStories = .idle }
         } catch {
+            guard generation == storiesGeneration else { return }
             if latestStories.value == nil { latestStories = .failed(Loadable<[Story]>.message(for: error)) }
         }
     }
