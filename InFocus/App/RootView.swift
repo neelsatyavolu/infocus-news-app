@@ -24,7 +24,16 @@ struct RootView: View {
                 .tabItem { Label("More", systemImage: "ellipsis") }
                 .tag(AppTab.more)
         }
-        .sheet(item: $router.presented) { destination in
+        .sheet(item: Binding(
+            get: { preferences.onboarded ? router.presented : nil },
+            set: { newValue in
+                // While the welcome cover is up, ignore a nil write. Otherwise
+                // SwiftUI clears a notification that arrived before onboarding finished.
+                if preferences.onboarded || newValue != nil {
+                    router.presented = newValue
+                }
+            }
+        )) { destination in
             NavigationStack {
                 DestinationView(destination: destination)
                     .toolbar {

@@ -16,6 +16,9 @@ final class StoriesModel {
     private var page = 0
     private var totalPages = 1
     private var generation = 0
+    /// What the stories currently on screen were loaded for.
+    private var loadedCategory: StoryCategory?
+    private var loadedQuery = ""
     private let client: WordPressClient
 
     init(client: WordPressClient = .shared) {
@@ -34,30 +37,41 @@ final class StoriesModel {
     func search(_ text: String) async {
         let text = text.trimmed
         guard text != query else { return }
-        query = text
-        // Wait for typing to pause; a newer search cancels this one.
+        // Wait for typing to pause before changing what the list is showing.
+        // A newer search cancels this one; committing early would leave the
+        // field and the results disagreeing if this task is cancelled.
         try? await Task.sleep(for: .milliseconds(350))
-        guard !Task.isCancelled, query == text else { return }
+        guard !Task.isCancelled else { return }
+        query = text
         await reload()
     }
 
     func reload() async {
         generation += 1
         let current = generation
-        page = 0
-        totalPages = 1
-        if stories.isEmpty { state = .loading }
+        // Same category and search: a refresh. Anything else must not keep
+        // showing the previous list (Sports stories under the News chip).
+        let refreshing = category == loadedCategory && query == loadedQuery && state.value != nil
+        if !refreshing {
+            page = 0
+            totalPages = 1
+            stories = []
+            state = .loading
+        }
         do {
             let first = try await fetch(page: 1)
             guard current == generation else { return }
             stories = first.stories
             page = 1
             totalPages = first.totalPages
+            loadedCategory = category
+            loadedQuery = query
             state = .loaded(())
         } catch is CancellationError {
             if current == generation, state.isLoading { state = .idle }
         } catch {
             guard current == generation else { return }
+            if refreshing { return }
             stories = []
             state = .failed(Loadable<Void>.message(for: error))
         }

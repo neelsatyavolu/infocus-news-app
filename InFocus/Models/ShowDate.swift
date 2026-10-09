@@ -4,11 +4,13 @@ import Foundation
 enum ShowDate {
     static let timeZone = TimeZone(identifier: "America/Los_Angeles")!
 
-    private static var calendar: Calendar {
+    /// Pacific calendar. Show days and the announcement date pickers use it,
+    /// so a chosen day doesn't shift for someone outside Pacific time.
+    static let calendar: Calendar = {
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = timeZone
         return calendar
-    }
+    }()
 
     /// Noon Pacific on that day (safe from DST edges), or nil if malformed.
     static func parse(_ key: String) -> Date? {

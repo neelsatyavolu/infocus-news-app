@@ -65,7 +65,7 @@ private struct AnnounceForm: View {
             } header: {
                 Text("Announcement")
             } footer: {
-                Text("\(model.form.announcement.count) / \(AnnouncementSubmission.maxLength)")
+                Text("\(model.form.announcement.trimmed.count) / \(AnnouncementSubmission.maxLength)")
                     .font(.mono(12))
                     .monospacedDigit()
                     .frame(maxWidth: .infinity, alignment: .trailing)
@@ -145,6 +145,8 @@ private struct DatesSection: View {
         } footer: {
             Text("Up to \(AnnouncementSubmission.maxShowDays) consecutive show days. Shows air Wednesdays and Fridays.")
         }
+        .environment(\.calendar, ShowDate.calendar)
+        .environment(\.timeZone, ShowDate.timeZone)
     }
 
     private func label(_ key: String) -> String {
