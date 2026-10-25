@@ -106,7 +106,7 @@ private struct AnnounceForm: View {
                 .listRowInsets(EdgeInsets())
                 .listRowBackground(Color.clear)
             } footer: {
-                Text("InFocus uses your name and email only to review your announcement and contact you about it. [Privacy policy](https://infocuspaly.com/privacy)")
+                Text("InFocus uses your name and email only to review your announcement and contact you about it. [Privacy policy](https://infocusportal.com/privacy)")
                     .font(.small)
                     .foregroundStyle(Brand.muted)
                     .tint(Brand.green)

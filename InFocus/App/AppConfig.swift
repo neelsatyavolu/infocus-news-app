@@ -9,12 +9,12 @@ enum AppConfig {
         if let raw = UserDefaults.standard.string(forKey: "InFocusPortalURL"), let url = URL(string: raw) { return url }
         #endif
         let raw = Bundle.main.object(forInfoDictionaryKey: "InFocusPortalURL") as? String
-        return raw.flatMap(URL.init(string:)) ?? URL(string: "https://infocuspaly.com")!
+        return raw.flatMap(URL.init(string:)) ?? URL(string: "https://infocusportal.com")!
     }()
 
     static let newsSiteURL = URL(string: "https://infocusnews.tv/")!
-    static let privacyURL = URL(string: "https://infocuspaly.com/privacy")!
-    static let supportURL = URL(string: "https://infocuspaly.com/support")!
+    static let privacyURL = URL(string: "https://infocusportal.com/privacy")!
+    static let supportURL = URL(string: "https://infocusportal.com/support")!
 
     static var version: String {
         Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0"

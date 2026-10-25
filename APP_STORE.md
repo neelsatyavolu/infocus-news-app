@@ -16,9 +16,9 @@ Then `scripts/release-ios.sh` uploads builds. Internal testers (team members) ge
 
 - **Subtitle:** Paly's student news, live
 - **Category:** News · secondary Education
-- **Support URL:** https://infocuspaly.com/support (also linked in the app: More → Help & support)
+- **Support URL:** https://infocusportal.com/support (also linked in the app: More → Help & support)
 - **Marketing URL:** https://infocusnews.tv
-- **Privacy Policy URL:** https://infocuspaly.com/privacy (also in the app: More → Privacy policy, and under the announcement form)
+- **Privacy Policy URL:** https://infocusportal.com/privacy (also in the app: More → Privacy policy, and under the announcement form)
 - **Keywords:** `paly,palo alto,high school,student,news,broadcast,infocus,announcements,sports,livestream,school`
 
 **Promotional text**

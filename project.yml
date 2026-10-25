@@ -44,7 +44,7 @@ targets:
           - UIInterfaceOrientationLandscapeLeft
           - UIInterfaceOrientationLandscapeRight
         UIApplicationSupportsIndirectInputEvents: true
-        InFocusPortalURL: https://infocuspaly.com
+        InFocusPortalURL: https://infocusportal.com
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.infocuspaly.news

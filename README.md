@@ -19,7 +19,7 @@ Notifications: the first launch explains the three alerts and only then asks iOS
 ## Where the data comes from
 
 - **Stories:** the WordPress REST API on infocusnews.tv (`/wp-json/wp/v2/posts`, `categories`, `staff_name` for bylines). The site's firewall rejects non-browser requests, so the app sends a Safari user agent. A story's video isn't in the REST content, so the app reads the first YouTube embed between the headline and the share icons of the story page (`StoryPageParser`).
-- **Shows, live, announcements, alerts:** the InFocus Portal's public API (`https://infocuspaly.com/api/public/…`), which reads the InFocus YouTube channel and the show's teleprompter bulletin on the server. The app holds no API keys.
+- **Shows, live, announcements, alerts:** the InFocus Portal's public API (`https://infocusportal.com/api/public/…`), which reads the InFocus YouTube channel and the show's teleprompter bulletin on the server. The app holds no API keys.
 - **About us, Contact, Staff:** the site's `about` and `contact-us` pages (REST), rendered natively by `ArticleHTML` (headings, paragraphs, lists, bold, links); the staff grid from the staff page (`/staff/?schoolyear=…`, parsed by `StaffPageParser`) with bios from the `staff_profile` post type.
 - **Announcement form:** the Portal's existing `POST /api/announcements/submit`.
 - **Video:** the YouTube embed player (`youtube-nocookie.com`) in a web view, with "Open in YouTube".

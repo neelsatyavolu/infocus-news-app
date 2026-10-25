@@ -127,6 +127,6 @@ struct SocialTests {
     @Test func everyLinkIsHTTPS() {
         #expect(SocialLink.all.map(\.network) == ["Instagram", "YouTube", "TikTok", "X", "Website"])
         #expect(SocialLink.all.allSatisfy { $0.url.scheme == "https" })
-        #expect(AppConfig.privacyURL.absoluteString == "https://infocuspaly.com/privacy")
+        #expect(AppConfig.privacyURL.absoluteString == "https://infocusportal.com/privacy")
     }
 }
