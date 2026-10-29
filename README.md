@@ -2,7 +2,7 @@
 
 The public app for **InFocus**, Palo Alto High School's student broadcast network: every InFocus News episode, the stories from [infocusnews.tv](https://infocusnews.tv), livestreamed games and events, and a way to send an announcement for the show.
 
-Bundle ID `com.infocuspaly.news` · SwiftUI · iOS 17+ · no third-party dependencies.
+Bundle ID `com.infocuspaly.news` · SwiftUI · iOS 17+ · iPhone, and iPad with pages in a centered column · no third-party dependencies.
 
 ## What's in it
 
